@@ -26,6 +26,7 @@ void convert_to_target(TargetContainer&, const CurrentContainer&, ...)
 template<typename TargetContainer, typename Type, typename CurrentContainer = std::vector<Type>>
 class container_converter
 {
+public:
     void convert_to_target(TargetContainer& relation_property, const CurrentContainer& result)
     {
         impl::convert_to_target<TargetContainer, Type, CurrentContainer>(relation_property, result, 0);
