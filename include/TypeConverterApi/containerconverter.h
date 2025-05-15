@@ -7,6 +7,17 @@
 namespace type_converter_api {
 namespace impl {
 
+#ifdef USE_TYPE_QT
+template<typename TargetContainer, typename Type, typename CurrentContainer = std::vector<Type>,
+    std::enable_if_t<sfinae::has_left_shift_container_operator_v<TargetContainer, Type>, bool> = true>
+void convert_to_target(TargetContainer& relation_property, const CurrentContainer& result, int)
+{
+    for(const auto& value : result) {
+        relation_property << value;
+    }
+}
+#endif
+
 template<typename TargetContainer, typename Type, typename CurrentContainer = std::vector<Type>,
     std::enable_if_t<sfinae::has_emplace_back_v<TargetContainer, Type>, bool> = true>
 void convert_to_target(TargetContainer& relation_property, const CurrentContainer& result, int)

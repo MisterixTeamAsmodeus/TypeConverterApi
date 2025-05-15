@@ -6,8 +6,31 @@
 #include <sstream>
 #include <string>
 
+#ifdef USE_TYPE_QT
+#    include <QDateTime>
+#    include <QJsonDocument>
+#    include <QJsonObject>
+#    include <QString>
+#endif
+
 namespace type_converter_api {
 namespace impl {
+
+#ifdef USE_TYPE_QT
+/// Реализация для классов имеющих оператор fromString
+template<typename T, std::enable_if_t<sfinae::has_from_string_v<T>, bool> = true>
+void fill_from_string(T& value, const std::string& str, int)
+{
+    value = T::fromString(QString::fromStdString(str));
+}
+
+/// Реализация для классов имеющих оператор toString
+template<typename T, std::enable_if_t<sfinae::has_to_string_v<T>, bool> = true>
+std::string convert_to_string(const T& value, int)
+{
+    return value.toString().toStdString();
+}
+#endif
 
 template<typename T, std::enable_if_t<sfinae::has_right_shift_operator_v<T>, bool> = true>
 void fill_from_string(T& value, const std::string& str, int)
@@ -22,25 +45,6 @@ std::string convert_to_string(const T& value, int)
 {
     std::stringstream stream;
     stream << value;
-
-    return stream.str();
-}
-
-template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
-void fill_from_string(T& value, const std::string& str, int)
-{
-    std::stringstream stream;
-    stream << str;
-    int temp;
-    stream >> temp;
-    value = static_cast<T>(temp);
-}
-
-template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
-std::string convert_to_string(const T& value, int)
-{
-    std::stringstream stream;
-    stream << static_cast<int>(value);
 
     return stream.str();
 }
@@ -173,5 +177,129 @@ public:
         return stream.str();
     }
 };
+
+template<typename T>
+class type_converter<T*>
+{
+public:
+    virtual ~type_converter() = default;
+
+    virtual void fill_from_string(T*& value, const std::string& str) const
+    {
+        if(str.empty())
+            return;
+
+        if(value == nullptr)
+            value = new T();
+
+        std::stringstream stream;
+        stream << str;
+        stream >> *value;
+    }
+
+    virtual std::string convert_to_string(T*& value) const
+    {
+        if(value == nullptr)
+            return "";
+
+        std::stringstream stream;
+        stream << *value;
+
+        return stream.str();
+    }
+};
+
+#ifdef USE_TYPE_QT
+
+template<>
+class type_converter<QDateTime>
+{
+    static constexpr auto mask = "yyyy-MM-dd HH:mm:ss.zzz";
+
+public:
+    virtual ~type_converter() = default;
+
+    virtual void fill_from_string(QDateTime& value, const std::string& str) const
+    {
+        value = QDateTime::fromString(QString::fromStdString(str), mask);
+    }
+
+    virtual std::string convert_to_string(const QDateTime& value) const
+    {
+        return value.toString(mask).toStdString();
+    }
+};
+
+template<>
+class type_converter<QDate>
+{
+    static constexpr auto mask = "yyyy-MM-dd";
+
+public:
+    virtual ~type_converter() = default;
+
+    virtual void fill_from_string(QDate& value, const std::string& str) const
+    {
+        value = QDate::fromString(QString::fromStdString(str), mask);
+    }
+
+    virtual std::string convert_to_string(const QDate& value) const
+    {
+        return value.toString(mask).toStdString();
+    }
+};
+
+template<>
+class type_converter<QString>
+{
+public:
+    virtual ~type_converter() = default;
+
+    virtual void fill_from_string(QString& value, const std::string& str) const
+    {
+        value = QString::fromStdString(str);
+    }
+
+    virtual std::string convert_to_string(const QString& value) const
+    {
+        return value.toStdString();
+    }
+};
+
+template<>
+class type_converter<QByteArray>
+{
+public:
+    virtual ~type_converter() = default;
+
+    virtual void fill_from_string(QByteArray& value, const std::string& str) const
+    {
+        value = QByteArray::fromStdString(str);
+    }
+
+    virtual std::string convert_to_string(const QByteArray& value) const
+    {
+        return value.toStdString();
+    }
+};
+
+template<>
+class type_converter<QJsonObject>
+{
+public:
+    virtual ~type_converter() = default;
+
+    virtual void fill_from_string(QJsonObject& value, const std::string& str) const
+    {
+        value = QJsonDocument::fromJson(QString::fromStdString(str).toUtf8()).object();
+    }
+
+    virtual std::string convert_to_string(const QJsonObject& value) const
+    {
+        return QString(QJsonDocument(value).toJson(QJsonDocument::Indented)).toStdString();
+    }
+};
+
+#endif
 
 } // namespace type_converter_api
