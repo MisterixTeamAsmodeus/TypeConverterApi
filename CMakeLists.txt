@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 set(type_converter_api_project_name TypeConverterApi)
 project(${type_converter_api_project_name} LANGUAGES CXX)
 
-option(USE_TYPE_QT "Включить поддержку Qt типов в библиотеки" OFF)
+option(ENABLE_TYPE_CONVERTER_API_QT "Включить поддержку Qt типов в библиотеки" ON)
 
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
@@ -17,7 +17,8 @@ set_target_properties(${PROJECT_NAME}
         OUTPUT_NAME ${PROJECT_NAME}
 )
 
-if (USE_TYPE_QT)
+if (ENABLE_TYPE_CONVERTER_API_QT)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC USE_TYPE_QT)
     add_definitions(-DUSE_TYPE_QT)
 
     find_package(Qt5 COMPONENTS Core REQUIRED)
