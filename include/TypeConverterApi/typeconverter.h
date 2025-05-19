@@ -224,7 +224,7 @@ public:
 template<>
 class type_converter<QDateTime>
 {
-    static constexpr auto mask = "yyyy-MM-dd HH:mm:ss.zzz";
+    static constexpr auto mask = "yyyy-MM-ddTHH:mm:ss.zzz";
 
 public:
     virtual ~type_converter() = default;
