@@ -32,6 +32,16 @@ std::string convert_to_string(const T& value, int)
 }
 #endif
 
+template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
+void fill_from_string(T& value, const std::string& str, int)
+{
+    std::stringstream stream;
+    stream << str;
+    std::underlying_type_t<T> t;
+    stream >> t;
+    value = static_cast<T>(t);
+}
+
 template<typename T, std::enable_if_t<sfinae::has_right_shift_operator_v<T>, bool> = true>
 void fill_from_string(T& value, const std::string& str, int)
 {
