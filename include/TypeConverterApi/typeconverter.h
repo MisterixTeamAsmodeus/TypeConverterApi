@@ -14,6 +14,10 @@
 #endif
 
 namespace type_converter_api {
+
+template<typename T>
+class type_converter;
+
 namespace impl {
 
 #ifdef USE_TYPE_QT
@@ -35,14 +39,19 @@ std::string convert_to_string(const T& value, int)
 template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
 void fill_from_string(T& value, const std::string& str, int)
 {
-    std::stringstream stream;
-    stream << str;
     std::underlying_type_t<T> t;
-    stream >> t;
+    type_converter<decltype(t)>().fill_from_string(t, str);
+
     value = static_cast<T>(t);
 }
 
-template<typename T, std::enable_if_t<sfinae::has_right_shift_operator_v<T>, bool> = true>
+template<typename T, std::enable_if_t<std::is_enum<T>::value, bool> = true>
+std::string convert_to_string(const T& value, int)
+{
+    return type_converter<std::underlying_type_t<T>>().convert_to_string(static_cast<std::underlying_type_t<T>>(value));
+}
+
+template<typename T, std::enable_if_t<sfinae::has_right_shift_operator_v<T> && !std::is_enum<T>::value, bool> = true>
 void fill_from_string(T& value, const std::string& str, int)
 {
     std::stringstream stream;
@@ -50,7 +59,7 @@ void fill_from_string(T& value, const std::string& str, int)
     stream >> value;
 }
 
-template<typename T, std::enable_if_t<sfinae::has_left_shift_operator_v<T>, bool> = true>
+template<typename T, std::enable_if_t<sfinae::has_left_shift_operator_v<T> && !std::is_enum<T>::value, bool> = true>
 std::string convert_to_string(const T& value, int)
 {
     std::stringstream stream;
