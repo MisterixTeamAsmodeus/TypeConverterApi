@@ -1,5 +1,7 @@
 #pragma once
 
+#include "void_t.h"
+
 #include <iostream>
 #include <type_traits>
 #include <utility>
@@ -20,7 +22,7 @@ struct has_to_string : std::false_type
 
 /// Структура для проверки наличия оператора toString
 template<typename T>
-struct has_to_string<T, std::void_t<decltype(std::declval<T>().toString())>>
+struct has_to_string<T, void_t<decltype(std::declval<T>().toString())>>
     : std::true_type
 {
 };
@@ -37,7 +39,7 @@ struct has_from_string : std::false_type
 
 /// Структура для проверки наличия оператора fromString
 template<typename T>
-struct has_from_string<T, std::void_t<decltype(T::fromString(QString()))>>
+struct has_from_string<T, void_t<decltype(T::fromString(QString()))>>
     : std::true_type
 {
 };
@@ -54,7 +56,7 @@ struct has_left_shift_container_operator : std::false_type
 
 /// Структура для проверки наличия оператора << для вставки в контейнер
 template<typename Container, typename T>
-struct has_left_shift_container_operator<Container, T, std::void_t<decltype((std::declval<Container&>() << std::declval<T>()))>>
+struct has_left_shift_container_operator<Container, T, void_t<decltype((std::declval<Container&>() << std::declval<T>()))>>
     : std::true_type
 {
 };
@@ -72,7 +74,7 @@ struct has_left_shift_operator : std::false_type
 
 /// Структура для проверки наличия оператора <<
 template<typename T>
-struct has_left_shift_operator<T, std::void_t<decltype((std::declval<std::ostream&>() << std::declval<T>()))>>
+struct has_left_shift_operator<T, void_t<decltype((std::declval<std::ostream&>() << std::declval<T>()))>>
     : std::true_type
 {
 };
@@ -89,7 +91,7 @@ struct has_right_shift_operator : std::false_type
 
 /// Структура для проверки наличия оператора >>
 template<typename T>
-struct has_right_shift_operator<T, std::void_t<decltype((std::declval<std::istream&>() >> std::declval<T&>()))>>
+struct has_right_shift_operator<T, void_t<decltype((std::declval<std::istream&>() >> std::declval<T&>()))>>
     : std::true_type
 {
 };
@@ -106,7 +108,7 @@ struct has_emplace_back : std::false_type
 
 /// Структура для проверки наличия оператора emplace_back
 template<typename Container, typename T>
-struct has_emplace_back<Container, T, std::void_t<decltype((std::declval<Container&>().emplace_back(std::declval<T>())))>>
+struct has_emplace_back<Container, T, void_t<decltype((std::declval<Container&>().emplace_back(std::declval<T>())))>>
     : std::true_type
 {
 };
