@@ -8,6 +8,8 @@ option(ENABLE_TYPE_CONVERTER_API_QT "Включить поддержку Qt ти
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
 
+add_subdirectory(tests)
+
 add_library(${PROJECT_NAME} STATIC ${HEADER_FILES} ${SOURCE_FILES})
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
