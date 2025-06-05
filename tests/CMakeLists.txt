@@ -6,6 +6,8 @@ enable_testing()
 
 file(GLOB_RECURSE SOURCE_FILES *.cpp)
 
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
 if (NOT TARGET GTest::gtest_main)
     add_subdirectory(googletest)
 endif ()
