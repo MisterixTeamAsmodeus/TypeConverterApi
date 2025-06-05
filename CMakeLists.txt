@@ -4,11 +4,14 @@ set(type_converter_api_project_name TypeConverterApi)
 project(${type_converter_api_project_name} LANGUAGES CXX)
 
 option(ENABLE_TYPE_CONVERTER_API_QT "Включить поддержку Qt типов в библиотеки" OFF)
+option(ENABLE_TYPE_CONVERTER_API_TEST "Включить тесты для TypeConverterApi" OFF)
 
 file(GLOB_RECURSE HEADER_FILES include/*.h)
 file(GLOB_RECURSE SOURCE_FILES src/*.cpp)
 
-add_subdirectory(tests)
+if(${ENABLE_TYPE_CONVERTER_API_TEST})
+    add_subdirectory(tests)
+endif ()
 
 add_library(${PROJECT_NAME} STATIC ${HEADER_FILES} ${SOURCE_FILES})
 
