@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.8)
 
 set(type_converter_api_project_name TypeConverterApi)
 project(${type_converter_api_project_name} LANGUAGES CXX)
@@ -16,11 +16,6 @@ endif ()
 add_library(${PROJECT_NAME} STATIC ${HEADER_FILES} ${SOURCE_FILES})
 
 target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
-
-set_target_properties(${PROJECT_NAME}
-        PROPERTIES
-        OUTPUT_NAME ${PROJECT_NAME}
-)
 
 if (ENABLE_TYPE_CONVERTER_API_QT)
     target_compile_definitions(${PROJECT_NAME} PUBLIC USE_TYPE_QT)
